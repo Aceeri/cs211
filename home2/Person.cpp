@@ -1,5 +1,6 @@
 
 #include "Person.h"
+#include <iomanip>
 
 Person::Person(std::string n_id, std::string n_first, std::string n_last, char n_gender, int n_age) {
 	id = n_id;
@@ -30,10 +31,11 @@ int Person::get_age() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Person& person) {
-	os << "First: " << person.first
-	   << ", Last: " << person.last
-	   << ", Gender: " << person.gender
-	   << ", Age: " << person.age;
+	os << std::left
+	   << std::setw(12) << person.first
+	   << std::setw(12) << person.last
+	   << std::setw(8) << person.gender
+	   << std::setw(5) << person.age;
 
 	return os;
 }

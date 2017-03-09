@@ -1,5 +1,6 @@
 
 #include "Passenger.h"
+#include <iomanip>
 
 Passenger::Passenger() {
 	person = Person();
@@ -20,7 +21,7 @@ Preference Passenger::get_preference() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Passenger& passenger) {
-	os << passenger.person << ", " << passenger.preferences;
+	os << passenger.person << passenger.preferences;
 	return os;
 }
 

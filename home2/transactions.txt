@@ -64,8 +64,8 @@ PrintFlightInfo 110
 PrintFlightPassengers 110
 PrintFlightInfo 150  
 
-isFlightFull 100
-isFlightFull 130
+IsFlightFull 100
+IsFlightFull 130
 
 PrintAssistancePassengers 100 wheelchair
 PrintAssistancePassengers 100 vegetarian

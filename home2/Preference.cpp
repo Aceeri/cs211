@@ -1,5 +1,6 @@
 
 #include "Preference.h"
+#include <iomanip>
 
 Preference::Preference(std::string assistance_type, std::string meal_type) {
 	assistance = assistance_type;
@@ -15,7 +16,8 @@ std::string Preference::get_meal() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Preference& preference) {
-	os << "Assistance: " << preference.assistance
-	   << ", Meal: " << preference.meal;
+	os << std::left
+	   << std::setw(15) << preference.assistance
+	   << std::setw(15) << preference.meal;
 	return os;
 }

@@ -1,22 +1,24 @@
 
+CC := g++
+
 flight: FlightReservation.o Flight.o Passenger.o Person.o Preference.o
-	g++ main.cpp FlightReservation.o Flight.o Passenger.o Person.o Preference.o -o flight
+	$(CC) main.cpp FlightReservation.o Flight.o Passenger.o Person.o Preference.o -o flight
 	make clean
 
 FlightReservation.o:
-	g++ -c FlightReservation.cpp
+	$(CC) -c FlightReservation.cpp
 
 Flight.o:
-	g++ -c Flight.cpp
+	$(CC) -c Flight.cpp
 
 Passenger.o:
-	g++ -c Passenger.cpp
+	$(CC) -c Passenger.cpp
 
 Person.o:
-	g++ -c Person.cpp
+	$(CC) -c Person.cpp
 
 Preference.o:
-	g++ -c Preference.cpp
+	$(CC) -c Preference.cpp
 
 .PHONY: clean
 

@@ -13,9 +13,11 @@ public:
 	Passenger();
 	Passenger(Person, Preference);
 
+	// Getters for members.
 	Person get_person() const;
 	Preference get_preference() const;
 
+	// Prints object.
 	friend std::ostream& operator<<(std::ostream& os, const Passenger& passenger);
 };
 

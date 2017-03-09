@@ -1,8 +1,20 @@
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "FlightReservation.h"
 #include "Passenger.h"
+
+#ifdef __unix
+	#define BOLD "\e[1m\e[32m"
+	#define UNBOLD "\e[0m\e[39m"
+#elif __posix
+	#define BOLD "\e[1m\e[32m"
+	#define UNBOLD "\e[0m\e[39m"
+#else
+	#define BOLD ""
+	#define UNBOLD ""
+#endif
 
 bool FlightReservation::failure = false;
 bool FlightReservation::success = true;
@@ -49,7 +61,7 @@ bool FlightReservation::create_passenger(std::string id, std::string first, std:
 }
 
 bool FlightReservation::create_flight(std::string depart, std::string arrival, std::string date, std::string time, float duration, int cap) {
-	Flight flight(Flight(depart, arrival, date, time, duration, cap, std::vector<std::string>()));
+	Flight flight(Flight(depart, arrival, date, time, duration, cap));
 	flights.push_back(flight);
 	return true;
 }
@@ -88,14 +100,18 @@ void FlightReservation::print_passengers() const {
 	if (passengers.size() == 0) {
 		std::cout << "There are currently no passengers registered for flights." << std::endl;
 	}
-
-	for (int i = 0; i < passengers.size(); i++) {
-		std::cout << passengers[i] << std::endl;
+	else {
+		print_passenger_list(passengers);
 	}
 }
 
 void FlightReservation::print_flights() const {
-
+	if (flights.size() == 0) {
+		std::cout << "There are currently no flights registered." << std::endl;
+	}
+	else {
+		print_flight_list(flights);
+	}
 }
 
 std::vector<std::string> split(const std::string& str) {
@@ -133,6 +149,13 @@ bool FlightReservation::process_transactions(std::string filename) {
 	std::string line;
 	while (getline(file, line)) {
 		std::vector<std::string> args = split(line);
+
+
+		if (args.size() != 0 && args[0].size() > 0) {
+			std::cout << "> "
+					  << line
+					  << std::endl;
+		}
 		
 		if (args.size() == 0) {
 			std::cout << "No command" << std::endl;
@@ -142,12 +165,191 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Not enough arguments for command `CreateNewPassenger`" << std::endl;
 			}
 
-			create_passenger(args[3], args[1], args[2], args[4].at(0), atoi(args[5].c_str()), args[6], args[7]);
-			std::cout << "CURRENT PASSENGERS: " << std::endl;
-			print_passengers();
+			std::cout << "Creating a passenger";
+			bool success = create_passenger(args[3], args[1], args[2], args[4].at(0), atoi(args[5].c_str()), args[6], args[7]);
+
+			if (success) {	
+				std::cout << "Created passenger" << std::endl;
+			}
+			else {
+				std::cout << "Failed to create passenger, duplicate id" << std::endl;
+			}
 		}
 		else if (args[0] == "PrintAllPassengers") {
 			print_passengers();
 		}
+		else if (args[0] == "CreateNewFlight") {
+			if (args.size() < 7) {
+				std::cout << "Not enough arguments for command `CreateNewFlight`" << std::endl;
+			}
+
+			std::cout << "Creating a flight" << std::endl;
+			bool success = create_flight(args[1], args[2], args[3], args[4], atof(args[5].c_str()), atoi(args[6].c_str()));
+			
+			if (success) {
+				std::cout << "Created flight" << std::endl;
+			}
+			else {
+				std::cout << "Failed to create flight" << std::endl;
+			}
+		}
+		else if (args[0] == "PrintAllFlights") {
+			print_flights();
+		}
+		else if (args[0] == "PrintSpecificFlights") {
+			if (args.size() < 4) {
+				std::cout << "Not enough arguments for command `PrintSpecificFlights`" << std::endl;
+			}
+			
+			std::string departure, arrival, date;
+			departure = args[1];
+			arrival = args[2];
+			date = args[3];
+
+			std::vector<Flight> list;
+			for (int i = 0; i < flights.size(); i++) {
+				if (flights[i].get_departure() == args[1]
+					&& flights[i].get_arrival() == args[2]
+					&& flights[i].get_date() == args[3]) {
+					list.push_back(flights[i]);
+				}
+			}
+
+			if (list.size() == 0) {
+				std::cout << "No flights matched the description given." << std::endl;
+			}
+			else {
+				print_flight_list(list);
+			}
+		}
+		else if (args[0] == "AddFlightPassenger") {
+			if (args.size() < 3) {
+				std::cout << "Not enough arguments for command `AddFlightPassenger`" << std::endl;
+			}
+			
+			long flight_id = atol(args[1].c_str());
+			bool success = add_passenger(flight_id, args[2]);
+			if (success) {
+				std::cout << "Added passenger `" << args[2] << "` to flight `" << flight_id << "`" << std::endl;
+			}
+			else {
+				std::cout << "Unable to add passenger `" << args[2] << "` to flight `" << flight_id << "`" << std::endl;
+			}
+		}
+		else if (args[0] == "RemoveFlightPassenger") {
+			if (args.size() < 3) {
+				std::cout << "Not enough arguments for command `RemoveFlightPassenger`" << std::endl;
+			}
+			
+			long flight_id = atol(args[1].c_str());
+			bool success = remove_passenger(flight_id, args[2]);
+			if (success) {
+				std::cout << "Removed passenger `" << args[2] << "` from flight `" << flight_id << "`" << std::endl;
+			}
+			else {
+				std::cout << "Unable to remove passenger `" << args[2] << "` from flight `" << flight_id << "`" << std::endl;
+			}
+		}
+		else if (args[0] == "PrintFlightInfo") {
+			if (args.size() < 2) {
+				std::cout << "Not enough arguments for command `PrintFlightInfo`" << std::endl;
+			}
+
+			long flight_id = atol(args[1].c_str());
+			int index = find_flight(flight_id);
+
+			if (index == -1) {
+				std::cout << "Flight `" << flight_id << "` does not exist." << std::endl;
+			}
+			else {
+				std::vector<Flight> list = { flights[index] };
+				print_flight_list(list);
+			}
+		}
+		else if (args[0] == "PrintFlightPassengers") {
+			if (args.size() < 2) {
+				std::cout << "Not enough arguments for command `PrintFlightInfo`" << std::endl;
+			}
+
+			long flight_id = atol(args[1].c_str());
+			int index = find_flight(flight_id);
+
+			if (index == -1) {
+				std::cout << "Flight `" << flight_id << "` does not exist." << std::endl;
+			}
+			else {
+				Flight flight = flights[index];
+				std::vector<std::string> ids = flight.get_passengers();
+				std::vector<Passenger> list;
+
+				for (int i = 0; i < ids.size(); i++) {
+					int index = find_passenger(ids[i]);
+
+					if (index != -1) {
+						list.push_back(passengers[index]);		
+					}
+				}
+				print_passenger_list(list);
+			}
+		}
+		else if (args[0] == "IsFlightFull") {
+			if (args.size() < 2) {
+				std::cout << "Not enough arguments for command `IsFlightFull`" << std::endl;
+			}
+
+			long flight_id = atol(args[1].c_str());
+			bool full = is_flight_full(flight_id);
+
+			if (full) {
+				std::cout << "Flight `" << flight_id << "` is full." << std::endl;
+			}
+			else {
+				std::cout << "Flight `" << flight_id << "` is not full." << std::endl;
+			}
+		}
+		else if (args[0] == "PrintAssistancePassengers") {
+			if (args.size() < 3) {
+				std::cout << "Not enough arguments for command `PrintAssistancePassengers`" << std::endl;
+			}
+
+			long flight_id = atol(args[1].c_str());
+			
+		}
 	}
 }
+
+void FlightReservation::print_flight_list(const std::vector<Flight>& list) const {
+	std::cout << std::left
+	   << BOLD 
+	   << std::setw(6) << "Id"
+	   << std::setw(10) << "Departure"
+	   << std::setw(10) << "Arrival"
+	   << std::setw(15) << "Date"
+	   << std::setw(10) << "Time"
+	   << std::setw(9) << "Duration"
+	   << std::setw(8) << "Capacity"
+	   << UNBOLD 
+	   << std::endl;
+
+	for (int i = 0; i < list.size(); i++) {
+		std::cout << list[i] << std::endl;
+	}
+}
+
+void FlightReservation::print_passenger_list(const std::vector<Passenger>& list) const {
+	std::cout << std::left
+		<< BOLD 
+		<< std::setw(12) << "First"
+		<< std::setw(12) << "Last"
+		<< std::setw(8) << "Gender"
+		<< std::setw(5) << "Age"
+		<< std::setw(15) << "Assistance"
+		<< std::setw(15) << "Meal"
+		<< UNBOLD
+		<< std::endl;
+
+	for (int i = 0; i < list.size(); i++) {
+		std::cout << list[i] << std::endl;
+	}
+}
+
