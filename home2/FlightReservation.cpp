@@ -1,14 +1,15 @@
 
 #include <iostream>
 #include <iomanip>
+#include <stdio.h>
+#include <stdlib.h>
 #include <fstream>
 #include "FlightReservation.h"
 #include "Passenger.h"
 
-#ifdef __unix
-	#define BOLD "\e[1m\e[32m"
-	#define UNBOLD "\e[0m\e[39m"
-#elif __posix
+//#define ANSI // If you want color coded output and your terminal supports ANSI escape codes.
+
+#ifdef ANSI
 	#define BOLD "\e[1m\e[32m"
 	#define UNBOLD "\e[0m\e[39m"
 #else
@@ -61,7 +62,7 @@ bool FlightReservation::create_passenger(std::string id, std::string first, std:
 }
 
 bool FlightReservation::create_flight(std::string depart, std::string arrival, std::string date, std::string time, float duration, int cap) {
-	Flight flight(Flight(depart, arrival, date, time, duration, cap));
+	Flight flight(depart, arrival, date, time, duration, cap);
 	flights.push_back(flight);
 	return true;
 }
@@ -262,7 +263,8 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Flight `" << flight_id << "` does not exist." << std::endl;
 			}
 			else {
-				std::vector<Flight> list = { flights[index] };
+				std::vector<Flight> list;
+				list.push_back(flights[index]);
 				print_flight_list(list);
 			}
 		}

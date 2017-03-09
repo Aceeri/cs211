@@ -18,7 +18,8 @@ private:
 
 	static long next_id;
 public:
-	Flight(std::string depart = "Unknown", std::string arrival = "Unknown", std::string date = "Unknown", std::string time = "Unknown", float duration = 0.0, int cap = 0, std::vector<std::string> passengers = std::vector<std::string>());
+	Flight();
+	Flight(std::string depart, std::string arrival, std::string date, std::string time, float duration, int cap, std::vector<std::string> passengers = std::vector<std::string>());
 
 	// Adds a passenger id to the flight, returns false if there was a duplicate entry.
 	bool add_passenger(std::string id);
