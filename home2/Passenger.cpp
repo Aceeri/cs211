@@ -20,11 +20,7 @@ Preference Passenger::get_preference() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Passenger& passenger) {
-	os << "Passenger: ";
-	Person person = passenger.person;
-
-	//std::cout << person;
-	//os << passenger.get_person();
-	//os << passenger.get_person() << ", " << passenger.get_preference();
+	os << passenger.person << ", " << passenger.preferences;
+	return os;
 }
 

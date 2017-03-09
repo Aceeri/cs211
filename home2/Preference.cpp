@@ -17,4 +17,5 @@ std::string Preference::get_meal() const {
 std::ostream& operator<<(std::ostream& os, const Preference& preference) {
 	os << "Assistance: " << preference.assistance
 	   << ", Meal: " << preference.meal;
+	return os;
 }

@@ -34,5 +34,7 @@ std::ostream& operator<<(std::ostream& os, const Person& person) {
 	   << ", Last: " << person.last
 	   << ", Gender: " << person.gender
 	   << ", Age: " << person.age;
+
+	return os;
 }
 

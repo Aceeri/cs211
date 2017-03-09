@@ -1,6 +1,7 @@
 
 flight: FlightReservation.o Flight.o Passenger.o Person.o Preference.o
 	g++ main.cpp FlightReservation.o Flight.o Passenger.o Person.o Preference.o -o flight
+	make clean
 
 FlightReservation.o:
 	g++ -c FlightReservation.cpp
