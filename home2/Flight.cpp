@@ -4,6 +4,17 @@
 
 long Flight::next_id = 100;
 
+Flight::Flight(): id(Flight::next_id), capacity(0) {
+	departure_airport = "Unknown";
+	arrival_airport = "Unknown";
+	date = "Unknown";
+	time = "Unknown";
+	duration = 0.0;
+	passengers = std::vector<std::string>(); 
+
+	Flight::next_id += 10;
+}
+
 Flight::Flight(std::string departure, std::string arrival, std::string n_date, std::string n_time, float n_duration, int cap, std::vector<std::string> passenger_ids):
 	id(Flight::next_id), capacity(cap) {
 	departure_airport = departure;
