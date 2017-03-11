@@ -313,7 +313,34 @@ bool FlightReservation::process_transactions(std::string filename) {
 			}
 
 			long flight_id = atol(args[1].c_str());
-			
+			int index = find_flight(flight_id);
+
+			if (index == -1) {
+				std::cout << "Flight `" << flight_id << "` does not exist." << std::endl;
+			}
+			else {
+				Flight flight = flights[index];
+				std::vector<std::string> ids = flight.get_passengers();
+				std::vector<Passenger> list;
+
+				for (int i = 0; i < ids.size(); i++) {
+					int index = find_passenger(ids[i]);
+
+					if (index != -1) {
+						Preference preference = passengers[index].get_preference();
+						if (preference.get_assistance() == args[2] || preference.get_meal() == args[2]) {
+							list.push_back(passengers[index]);		
+						}
+					}
+				}
+
+				if (list.size() == 0) {
+					std::cout << "No passengers on Flight `" << flight_id << "` have a preference of type `" << args[2] << "`." << std::endl;
+				}
+				else {
+					print_passenger_list(list);
+				}
+			}
 		}
 	}
 }
