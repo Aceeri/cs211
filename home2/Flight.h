@@ -20,6 +20,7 @@ private:
 public:
 	Flight();
 	Flight(std::string depart, std::string arrival, std::string date, std::string time, float duration, int cap, std::vector<std::string> passengers = std::vector<std::string>());
+	Flight(const Flight&);
 
 	// Adds a passenger id to the flight, returns false if there was a duplicate entry.
 	bool add_passenger(std::string id);
@@ -40,6 +41,7 @@ public:
 
 	// Printing of object.
 	friend std::ostream& operator<<(std::ostream& os, const Flight& flight);
+	Flight& operator=(const Flight&);
 };
 
 #endif

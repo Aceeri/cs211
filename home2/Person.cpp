@@ -32,6 +32,7 @@ int Person::get_age() const {
 
 std::ostream& operator<<(std::ostream& os, const Person& person) {
 	os << std::left
+	   << std::setw(8) << person.id
 	   << std::setw(12) << person.first
 	   << std::setw(12) << person.last
 	   << std::setw(8) << person.gender

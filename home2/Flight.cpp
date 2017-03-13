@@ -27,6 +27,15 @@ Flight::Flight(std::string departure, std::string arrival, std::string n_date, s
 	Flight::next_id += 10;
 }
 
+Flight::Flight(const Flight& other): id(other.id), capacity(other.capacity) {
+	departure_airport = other.departure_airport;
+	arrival_airport = other.arrival_airport;
+	date = other.date;
+	time = other.time;
+	duration = other.duration;
+	passengers = other.passengers;
+}
+
 bool Flight::add_passenger(std::string id) {
 	for (int i = 0; i < passengers.size(); i++) {
 		if (passengers[i] == id) {
@@ -91,4 +100,8 @@ std::ostream& operator<<(std::ostream& os, const Flight& flight) {
 	   << std::setw(9) << flight.duration
 	   << std::setw(8) << flight.capacity;
 	return os;
+}
+
+Flight& Flight::operator=(const Flight& other) {
+	*this = other;
 }

@@ -166,11 +166,12 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Not enough arguments for command `CreateNewPassenger`" << std::endl;
 			}
 
-			std::cout << "Creating a passenger";
+			// Create a new passenger from the arguments.
+			// id, first, last, gender, age, assistance, meal
 			bool success = create_passenger(args[3], args[1], args[2], args[4].at(0), atoi(args[5].c_str()), args[6], args[7]);
 
 			if (success) {	
-				std::cout << "Created passenger" << std::endl;
+				std::cout << "Created passenger: " << passengers[passengers.size() - 1] << std::endl;
 			}
 			else {
 				std::cout << "Failed to create passenger, duplicate id" << std::endl;
@@ -184,11 +185,12 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Not enough arguments for command `CreateNewFlight`" << std::endl;
 			}
 
-			std::cout << "Creating a flight" << std::endl;
+			// Create a new flight from the arguments.
+			// departure, arrival, date, time, duration, capacity
 			bool success = create_flight(args[1], args[2], args[3], args[4], atof(args[5].c_str()), atoi(args[6].c_str()));
 			
 			if (success) {
-				std::cout << "Created flight" << std::endl;
+				std::cout << "Created flight: " << flights[flights.size() - 1] << std::endl;
 			}
 			else {
 				std::cout << "Failed to create flight" << std::endl;
@@ -207,6 +209,7 @@ bool FlightReservation::process_transactions(std::string filename) {
 			arrival = args[2];
 			date = args[3];
 
+			// sequential search through the flights to match arguments.
 			std::vector<Flight> list;
 			for (int i = 0; i < flights.size(); i++) {
 				if (flights[i].get_departure() == args[1]
@@ -228,6 +231,7 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Not enough arguments for command `AddFlightPassenger`" << std::endl;
 			}
 			
+			// Add a passenger to a flight given arguments.
 			long flight_id = atol(args[1].c_str());
 			bool success = add_passenger(flight_id, args[2]);
 			if (success) {
@@ -242,6 +246,7 @@ bool FlightReservation::process_transactions(std::string filename) {
 				std::cout << "Not enough arguments for command `RemoveFlightPassenger`" << std::endl;
 			}
 			
+			// Remove a passenger from a flight given arguments.
 			long flight_id = atol(args[1].c_str());
 			bool success = remove_passenger(flight_id, args[2]);
 			if (success) {
@@ -368,6 +373,7 @@ void FlightReservation::print_flight_list(const std::vector<Flight>& list) const
 void FlightReservation::print_passenger_list(const std::vector<Passenger>& list) const {
 	std::cout << std::left
 		<< BOLD 
+		<< std::setw(8) << "Id"
 		<< std::setw(12) << "First"
 		<< std::setw(12) << "Last"
 		<< std::setw(8) << "Gender"
