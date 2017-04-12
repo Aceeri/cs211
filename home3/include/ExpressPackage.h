@@ -8,6 +8,7 @@ private:
 	double fee; // fee per ounce
 public:
 	ExpressPackage();
+	ExpressPackage(const Package& package, double fee);
 	ExpressPackage(Information sender, Information recipient, std::string label, std::string date, double weight, double cost, Insurance insurance, double fee);
 };
 

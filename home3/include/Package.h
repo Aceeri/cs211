@@ -30,6 +30,12 @@ private:
 public:
 	Package();
 	Package(Information sender, Information recipient, std::string label, std::string date, double weight, double cost, Insurance insurance);
+
+	void print_information(const Information& information) const;
+	void print_insurance(const Insurance& insurance) const;
+	void print() const;
+
+	int get_year() const;
 };
 
 #endif
