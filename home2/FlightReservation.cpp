@@ -7,7 +7,7 @@
 #include "FlightReservation.h"
 #include "Passenger.h"
 
-//#define ANSI // If you want color coded output and your terminal supports ANSI escape codes.
+#define ANSI // If you want color coded output and your terminal supports ANSI escape codes.
 
 #ifdef ANSI
 	#define BOLD "\e[1m\e[32m"

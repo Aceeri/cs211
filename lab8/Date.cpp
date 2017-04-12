@@ -13,10 +13,30 @@ const int MONTH_LENGTH[12] = {
 };
 
 Date::Date(int month, int day, int year) {
-	this->month = month;
+	this->month = month - 1;
 	this->day = day;
 	this->year = year;
 	concatenate();
+}
+
+bool Date::is_leap(int year) const {
+	if (year % 4 == 0) {
+		if (year % 100 == 0) {
+			if (year % 400 == 0) {
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+
+int Date::get_length(int month, int year) const {
+	if (month == 1 && is_leap(year)) {
+		return 29;
+	}
+	return MONTH_LENGTH[month];
 }
 
 void Date::concatenate() {
@@ -66,6 +86,7 @@ std::ostream& operator<<(std::ostream& os, Date& date) {
 std::istream& operator>>(std::istream& is, Date& date) {
 	std::cout << "Input month: ";
 	is >> date.month;
+	date.month -= 1;
 
 	std::cout << "Input day: ";
 	is >> date.day;
@@ -74,7 +95,7 @@ std::istream& operator>>(std::istream& is, Date& date) {
 	is >> date.year;
 }
 
-bool operator>(Date& d1, Date& d2) {
+bool operator>(const Date& d1, const Date& d2) {
 	if (d1.year > d2.year) {
 		return true;
 	}
@@ -90,17 +111,94 @@ bool operator>(Date& d1, Date& d2) {
 	return false;
 }
 
-int operator-(Date& d1, Date& d2) {
+int operator-(const Date& d1, const Date& d2) {
 	int sum = 0;
 
-	sum += std::abs(d1.day - d2.day);
-	sum += std::abs(d1.year - d2.year) * 365;
+	Date lower, higher;
+	if (d1 > d2) {
+		lower = d2;
+		higher = d1;
+	}
+	else {
+		lower = d1;
+		higher = d2;
+	}
+	
+	int r_day = abs(higher.day - lower.day);
+	int r_month = abs(higher.month - lower.month);
+	int r_year = higher.year - lower.year;
 
-	int lower = std::min(d1.month, d2.month);
-	int higher = std::max(d1.month, d2.month);
-	for (int i = lower; i < higher; i++) {
-		sum += MONTH_LENGTH[i];
+	if (r_year > 0) {
+		// If the difference between years is greater than 0 then find the
+		// amount of days from the lower month to the end of the year plus
+		// the amount of days from the start of the year to the higher month
+		// plus the amount of days in the years in between.
+
+		sum += lower.get_length(lower.month, lower.year) - lower.day;
+		sum += higher.day;
+
+		for (int i = lower.month + 1; i < 12; i++) {
+			sum += lower.get_length(i, lower.year);
+		}
+
+		for (int i = 0; i < higher.month; i++) {
+			sum += higher.get_length(i, higher.year);
+		}
+
+		for (int i = lower.year; i < higher.year - 1; i++) {
+			if (lower.is_leap(i)) {
+				sum += 366;
+			}
+			else {
+				sum += 365;
+			}
+		}
+	}
+	else if (r_month > 0) {
+		sum += lower.get_length(lower.month, lower.year) - lower.day;
+		sum += higher.day;
+
+		for (int i = lower.month; i < higher.month - 1; i++) {
+			sum += lower.get_length(i, lower.year);
+		}
+	}
+	else {
+		sum += r_day;
 	}
 
 	return sum;
+}
+
+int Date::get_day() const {
+	return day;
+}
+
+int Date::get_month() const {
+	return month;
+}
+
+int Date::get_year() const {
+	return year;
+}
+
+void Date::set(int month, int day, int year) {
+	this->month = month - 1;
+	this->day = day;
+	this->year = year;
+	concatenate();
+}
+
+void Date::set_day(int day) {
+	this->day = day;
+	concatenate();
+}
+
+void Date::set_month(int month) {
+	this->month = month;
+	concatenate();
+}
+
+void Date::set_year(int year) {
+	this->year = year;
+	concatenate();
 }
